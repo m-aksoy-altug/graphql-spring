@@ -1,0 +1,197 @@
+query {
+    customerById(id: "2") {
+       firstName
+    	 lastName
+    	 email
+    	 phone
+       registrationDate
+    	 dateOfBirth
+    	 isActive
+       taxId
+    	 notes
+  },
+   customerByFirstAndLastName(firstName: "Bob", lastName: "Smith") {
+  		  firstName
+   		 lastName
+  },
+  customerByFirstName(firstName:"Bob"){
+    firstName
+    lastName
+  }
+  customerByEmail(email: "bob.smith@example.com"){
+    firstName
+    lastName
+  },
+  customerByLastName(lastName:"Smith"){
+    firstName
+    lastName
+  }
+}
+
+
+mutation {
+    addCustomer(firstName: "Jane", 
+      lastName: "Black",
+      email: "janeBalck@gmail.com",
+      phone:  "0402 345 679",
+      dateOfBirth: "1985-07-22" ) {
+      	firstName
+    	  lastName
+    	 email
+    	 phone
+       registrationDate
+    	 dateOfBirth
+    	 isActive
+       taxId
+    	 notes
+    }
+}
+
+
+query{
+   customerByEmail(email: "janeBalck@gmail.com"){
+    firstName
+    lastName
+    email
+    phone
+    registrationDate
+    dateOfBirth
+    isActive
+    notes
+  }
+}
+
+query{
+  allCustomers{
+    firstName
+    lastName
+    email
+    phone
+    registrationDate
+    dateOfBirth
+    isActive
+    notes
+  }
+}
+
+query{
+customerByEmail(email: "bob.smith@example.com"){
+    customerId
+  }
+customerAddressByCustomerId(id:"2"){
+  addressId
+  customerId
+  addressType
+  streetAddress1
+  streetAddress2
+  city
+  postalCode
+  country
+  isDefault
+  createdAt
+  updatedAt
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mutation {
+    addAuthor(id: "3", firstName: "author First Name", 
+      lastName: "author last Name") {
+        id
+        firstName
+        lastName
+    }
+}
+
+mutation {
+    addBook(id: "3", title: "GraphQL", 
+      author: "6", pages: 200) {
+        id
+        title
+        author {
+          id
+        }
+        pages
+    }
+}
+
+
+query {
+    bookById(id: "1") {
+        id
+        title
+         author {
+          id
+        }
+        pages
+    }
+}
+
+
+query {
+  books {
+    id
+    title
+    author {
+      name
+      books {
+        title
+      }
+    }
+  }
+}
+
+
+subscription {
+  bookAdded {
+    id
+    title
+    author {
+      id
+      firstName
+    }
+  }
+}
+
+
+query {
+    allBooks {
+        id
+        title
+         author {
+          id
+        }
+        pages
+    }
+
+    allAuthors {
+        id
+        firstName
+        lastName
+    }
+}
+
+

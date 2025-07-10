@@ -1,0 +1,51 @@
+type Query {
+    allCustomers: [CustomerDto]
+    customerById(id: ID!): CustomerDto
+    customerByFirstName(firstName: String!): [CustomerDto]
+    customerByLastName(lastName: String!): [CustomerDto]
+    customerByFirstAndLastName(firstName: String!, lastName: String!): [CustomerDto]
+    customerByEmail(email: String!): [CustomerDto]
+    
+    allAddresses: [CustomerAddressesDto]
+    customerAddressByCustomerId(id: ID!): [CustomerAddressesDto]
+    customerAddressByCity(city: String!): [CustomerAddressesDto]
+    customerAddressByPostCode(postCode: String!): [CustomerAddressesDto]
+    customerAddressByCountry(country: String!): [CustomerAddressesDto]
+}
+
+type Mutation {
+	addCustomer(firstName: String!,lastName: String!,email: String!,phone: String!,dateOfBirth: String!): CustomerDto
+}
+
+type Subscription {
+    customerRegistered: CustomerDto!
+}
+
+
+type CustomerDto {
+  customerId: String
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  dateOfBirth: String
+  registrationDate: String
+  isActive: Boolean
+  taxId: String
+  notes: String
+  addresses: [CustomerAddressesDto]
+}
+
+type CustomerAddressesDto {
+  addressId: String
+  customerId: String
+  addressType: String
+  streetAddress1: String
+  streetAddress2: String
+  city: String
+  postalCode: String
+  country: String
+  isDefault: Boolean
+  createdAt: String
+  updatedAt: String
+}
