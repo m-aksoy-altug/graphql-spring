@@ -16,6 +16,7 @@ type Query {
 type Mutation {
 	addCustomer(firstName: String!,lastName: String!,email: String!,phone: String!,dateOfBirth: String!): CustomerDto
 	addCustomerAddressByEmail(email: String!, addressType : String!, streetAddress1 : String!,streetAddress2 : String, city : String!,stateProvince : String!,postalCode : String!,country : String! ): CustomerDto
+
 }
 
 type Subscription {
