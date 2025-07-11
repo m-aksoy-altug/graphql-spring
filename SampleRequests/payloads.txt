@@ -93,105 +93,26 @@ customerAddressByCustomerId(id:"2"){
 }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 mutation {
-    addAuthor(id: "3", firstName: "author First Name", 
-      lastName: "author last Name") {
-        id
-        firstName
-        lastName
-    }
-}
-
-mutation {
-    addBook(id: "3", title: "GraphQL", 
-      author: "6", pages: 200) {
-        id
-        title
-        author {
-          id
-        }
-        pages
-    }
-}
-
-
-query {
-    bookById(id: "1") {
-        id
-        title
-         author {
-          id
-        }
-        pages
-    }
-}
-
-
-query {
-  books {
-    id
-    title
-    author {
-      name
-      books {
-        title
-      }
+  addCustomerAddressByEmail(
+    email: "isaac.kumar@example.com",
+    addressType: "both",
+    streetAddress1: "Queen St Kew",
+    streetAddress2: null,
+    city: "Melbourne",
+    stateProvince: "Victoria",
+    postalCode: "3101",
+    country: "Australia"
+  ) {
+    firstName
+    lastName
+    email
+    addresses {
+      postalCode
+      streetAddress1
+      city
     }
   }
-}
-
-
-subscription {
-  bookAdded {
-    id
-    title
-    author {
-      id
-      firstName
-    }
-  }
-}
-
-
-query {
-    allBooks {
-        id
-        title
-         author {
-          id
-        }
-        pages
-    }
-
-    allAuthors {
-        id
-        firstName
-        lastName
-    }
 }
 
 

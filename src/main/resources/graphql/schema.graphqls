@@ -4,7 +4,7 @@ type Query {
     customerByFirstName(firstName: String!): [CustomerDto]
     customerByLastName(lastName: String!): [CustomerDto]
     customerByFirstAndLastName(firstName: String!, lastName: String!): [CustomerDto]
-    customerByEmail(email: String!): [CustomerDto]
+    customerByEmail(email: String!): CustomerDto
     
     allAddresses: [CustomerAddressesDto]
     customerAddressByCustomerId(id: ID!): [CustomerAddressesDto]
@@ -15,6 +15,7 @@ type Query {
 
 type Mutation {
 	addCustomer(firstName: String!,lastName: String!,email: String!,phone: String!,dateOfBirth: String!): CustomerDto
+	addCustomerAddressByEmail(email: String!, addressType : String!, streetAddress1 : String!,streetAddress2 : String, city : String!,stateProvince : String!,postalCode : String!,country : String! ): CustomerDto
 }
 
 type Subscription {

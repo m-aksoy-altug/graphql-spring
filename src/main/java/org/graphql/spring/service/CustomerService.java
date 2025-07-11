@@ -3,11 +3,11 @@ package org.graphql.spring.service;
 import java.lang.invoke.ConstantBootstraps;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import org.graphql.spring.controller.CustomerController;
 import org.graphql.spring.dto.CustomerAddressesDto;
 import org.graphql.spring.dto.CustomerDto;
-import org.graphql.spring.entity.Book;
 import org.graphql.spring.entity.Customer;
 import org.graphql.spring.entity.CustomerAddresses;
 import org.graphql.spring.exception.NotFoundException;
@@ -51,6 +51,18 @@ public class CustomerService {
 		return savedDto;
 	}
 	
+	public CustomerDto addCustomerAddressByEmail(String email, CustomerAddressesDto customerAddressesDto) {
+		Customer customer= customersRepo.
+				findByEmail(email).orElseThrow(()->
+				new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email));
+		
+		customerAddressesDto.setCustomerId(customer.getId());
+		CustomerAddresses custEnt= customerAddressesDto.toEntity();
+		customerAddressesRepo.save(custEnt);
+		return CustomerDto.fromEntity(customer);
+	}
+	
+	
 	public CustomerDto getCustomerById(BigInteger id) {
 	    return customersRepo.findById(id)
 	        .map(CustomerDto::fromEntity)
@@ -85,14 +97,13 @@ public class CustomerService {
 	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
 	}
 	
-	public List<CustomerDto> getCustomerByEmail(String email) {
-	    List<Customer> customers = customersRepo.findByEmail(email);
+	public CustomerDto getCustomerByEmail(String email) {
+	    Optional<Customer>customer = customersRepo.findByEmail(email);
 	    // customers.stream().forEach(x->log.info("getCustomerByEmail:"+x.toString()));
-	    
-		if (customers.isEmpty()) {
+	   if (!customer.isPresent()) {
 	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email);
 	    }
-	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
+		return CustomerDto.fromEntity(customer.get());
 	}
 	
 	public List<CustomerDto> getAllCustomers() {

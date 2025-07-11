@@ -2,11 +2,11 @@ package org.graphql.spring.controller;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.graphql.spring.dto.CustomerAddressesDto;
 import org.graphql.spring.dto.CustomerDto;
-import org.graphql.spring.entity.Book;
 import org.graphql.spring.service.CustomerService;
 import org.graphql.spring.utils.Utils;
 import org.slf4j.Logger;
@@ -47,6 +47,28 @@ public class CustomerController {
 		return customerService.addCustomer(newCustomer);
 	}
 	
+	@SchemaMapping(typeName = "CustomerDto", field = "addresses")
+	public List<CustomerAddressesDto> getAddresses(CustomerDto customerDto) {
+	    return customerService.customerAddressByCustomerId(customerDto.getCustomerId());
+	
+	}
+	
+	@MutationMapping
+	public CustomerDto addCustomerAddressByEmail(@Argument String email, 
+												@Argument String addressType, 
+												@Argument String streetAddress1,
+												@Argument String streetAddress2, 
+												@Argument String city,
+												@Argument String stateProvince,
+												@Argument String postalCode,
+												@Argument String country) {
+		CustomerAddressesDto customerAddressesDto = 
+				new CustomerAddressesDto(null, addressType, streetAddress1, streetAddress2,
+						city,stateProvince,postalCode,country);
+		log.info("addCustomerAddressByEmail:" + email +  customerAddressesDto);
+		return customerService.addCustomerAddressByEmail(email,customerAddressesDto);
+	}	
+		
 	@QueryMapping
 	public List<CustomerDto> allCustomers() {
 		// TODO: Paging
@@ -75,9 +97,10 @@ public class CustomerController {
 		// log.info("customerByFirstAndLastName:"+firstName + lastName);
 		return customerService.getCustomerByFirstAndLastName(firstName, lastName);
 	}
-
+	
+	// Each has unique email address
 	@QueryMapping
-	public List<CustomerDto> customerByEmail(@Argument String email) {
+	public CustomerDto customerByEmail(@Argument String email) {
 		// log.info("customerByEmail:"+email);
 		return customerService.getCustomerByEmail(email);
 	}
@@ -112,10 +135,5 @@ public class CustomerController {
 		return customerService.allAddresses();
 	}
 	
-	@SchemaMapping(typeName = "CustomerDto", field = "addresses")
-	public List<CustomerAddressesDto> getAddresses(CustomerDto customerDto) {
-	    return customerService.customerAddressByCustomerId(customerDto.getCustomerId());
-	
-	}
 	
 }
