@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Initialize environment variables
+export SERVER_PORT=8090
+export SERVER_HOST=192.168.1.113
+export SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/OrderManagement
+export SPRING_DATASOURCE_USERNAME=OrderManagement_user
+export SPRING_DATASOURCE_PASSWORD=OrderManagement_admin_password
+export SPRING_DATASOURCE_DRIVERCLASSNAME=com.mysql.cj.jdbc.Driver
+export SPRING_PROFILES_ACTIVE=dev
+
+export MYSQL_ROOT_PASSWORD=P@ssw0rd
+export MYSQL_USER=OrderManagement_user
+export MYSQL_PASSWORD=OrderManagement_admin_password
+export MYSQL_DATABASE=OrderManagement
+export MYSQL_VOLUME_PATH="/home/altug/Desktop/mySQLContainer/db:/var/lib/mysql"
+       
+
+# Optional: Create a .env file for Docker Compose if needed
+cat <<EOF > .env
+SERVER_PORT=$SERVER_PORT
+SERVER_HOST=$SERVER_HOST
+SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL
+SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME
+SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD
+SPRING_DATASOURCE_DRIVERCLASSNAME=$SPRING_DATASOURCE_DRIVERCLASSNAME
+SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+MYSQL_USER=$MYSQL_USER
+MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_DATABASE=$MYSQL_DATABASE
+MYSQL_VOLUME_PATH=$MYSQL_VOLUME_PATH
+EOF
+
+
+echo "====== ENVIRONMENT VARIABLES ======"
+env | grep -E '^(SPRING_|MYSQL_|SERVER_)'
+echo "==================================="
+
+
+docker compose up --build
+# chmod +x run.sh
+# ./run.sh

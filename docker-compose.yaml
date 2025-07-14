@@ -12,23 +12,24 @@ services:
        - mysql
      environment:
        # SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/OrderManagement
-       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/OrderManagement
-       SPRING_DATASOURCE_USERNAME: OrderManagement_user
-       SPRING_DATASOURCE_PASSWORD: OrderManagement_admin_password
-       SPRING_DATASOURCE_DRIVERCLASSNAME: com.mysql.cj.jdbc.Driver
-       SERVER_PORT: 8090
-       SERVER_HOST: 192.168.1.113
+       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+       SPRING_DATASOURCE_DRIVERCLASSNAME: ${SPRING_DATASOURCE_DRIVERCLASSNAME}
+       SERVER_PORT: ${SERVER_PORT}
+       SERVER_HOST: ${SERVER_HOST}
+       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
   mysql:
      image: mysql:8.0
      ports:
        - "3306:3306"
      restart: always
      environment:
-       MYSQL_ROOT_PASSWORD: P@ssw0rd
-       MYSQL_USER: OrderManagement_user
-       MYSQL_PASSWORD: OrderManagement_admin_password
-       MYSQL_DATABASE: OrderManagement
+       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+       MYSQL_USER: ${MYSQL_USER}
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+       MYSQL_DATABASE: ${MYSQL_DATABASE}
      volumes:
-       - "/home/altug/Desktop/mySQLContainer/db:/var/lib/mysql"
+       - ${MYSQL_VOLUME_PATH}
 # docker exec -it <Cont-Id> bash
 # mysql -u root -p
