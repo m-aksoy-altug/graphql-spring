@@ -116,3 +116,31 @@ mutation {
 }
 
 
+query {
+  allProductCategories {
+    categoryId
+    parentCategoryId
+    name
+    description
+     childCategories {
+      categoryId
+      name
+      description
+    }
+  }
+}
+
+
+mutation{
+  addProductCategory(parentCategoryId: "1",
+					name:"Tablets",
+					description:"Tablets with advanced features"){
+categoryId
+    parentCategoryId
+    name
+    description
+    
+  }
+}
+
+

@@ -11,16 +11,21 @@ type Query {
     customerAddressByCity(city: String!): [CustomerAddressesDto]
     customerAddressByPostCode(postCode: String!): [CustomerAddressesDto]
     customerAddressByCountry(country: String!): [CustomerAddressesDto]
+    
+    allProductCategories: [ProductCategoriesDto]
+    productCategoryById(id: ID!): ProductCategoriesDto
+    
 }
 
 type Mutation {
 	addCustomer(firstName: String!,lastName: String!,email: String!,phone: String!,dateOfBirth: String!): CustomerDto
 	addCustomerAddressByEmail(email: String!, addressType : String!, streetAddress1 : String!,streetAddress2 : String, city : String!,stateProvince : String!,postalCode : String!,country : String! ): CustomerDto
-
+	addProductCategory(parentCategoryId: String , name: String!, description: String!): ProductCategoriesDto
 }
 
 type Subscription {
     customerRegistered: CustomerDto!
+    productCategoriesRegistered: ProductCategoriesDto!
 }
 
 
@@ -50,4 +55,12 @@ type CustomerAddressesDto {
   isDefault: Boolean
   createdAt: String
   updatedAt: String
+}
+
+type ProductCategoriesDto {
+	categoryId : String
+	parentCategoryId  : String
+    name: String
+    description: String
+    childCategories: [ProductCategoriesDto]
 }
