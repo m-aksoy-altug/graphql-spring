@@ -3,12 +3,13 @@ package org.graphql.spring.service;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.graphql.spring.dto.CustomerDto;
 import org.graphql.spring.dto.ProductCategoriesDto;
-import org.graphql.spring.entity.Customer;
+import org.graphql.spring.dto.ProductDto;
+import org.graphql.spring.entity.Product;
 import org.graphql.spring.entity.ProductCategories;
 import org.graphql.spring.exception.NotFoundException;
 import org.graphql.spring.repo.ProductCategoriesRepo;
+import org.graphql.spring.repo.ProductRepo;
 import org.graphql.spring.utils.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,21 @@ import reactor.core.publisher.Sinks;
 @Service
 public class ProductService {
 	private static final Logger log= LoggerFactory.getLogger(ProductService.class);
+	
 	private final Sinks.Many<ProductCategoriesDto> productCategorySink = Sinks.many().multicast().onBackpressureBuffer();
 	
 	@Autowired
 	private ProductCategoriesRepo productCategoriesRepo;
 	
+	@Autowired
+	private ProductRepo productRepo;
+	
 	public Flux<ProductCategoriesDto> getProductCategoriesStream() {
-		return productCategorySink.asFlux();
+		return productCategorySink.asFlux()
+				 .onErrorResume(e -> {
+		                log.error("Product Category Subscription error", e);
+		                return Flux.empty();
+		            });
 	}
 	
 	public List<ProductCategoriesDto> getAllProductCategories() {
@@ -63,8 +72,13 @@ public class ProductService {
 		return productCategory;
 	}
 
-	
-	
-	
+	public List<ProductDto> getAllProducts() {
+		List<Product> products = productRepo.findAll();
+	    if (products.isEmpty()) {
+	        throw new NotFoundException(Constant.PRODUCT_NOT_FOUND);
+	    }
+	    return products.stream().map(ProductDto::fromEntity).toList();
+	}
+
 	
 }

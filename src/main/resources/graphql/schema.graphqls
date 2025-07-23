@@ -15,6 +15,7 @@ type Query {
     allProductCategories: [ProductCategoriesDto]
     productCategoryById(id: ID!): ProductCategoriesDto
     
+    allProducts: [ProductDto]
 }
 
 type Mutation {
@@ -63,4 +64,19 @@ type ProductCategoriesDto {
     name: String
     description: String
     childCategories: [ProductCategoriesDto]
+}
+
+type ProductDto {
+	productId : String
+	sku : String
+	name  : String
+	description : String
+	categoryId : String
+	unitPrice  : String
+	weight : String
+	dimensions  : String
+	isActive  : Boolean
+	createdAt : String
+	updatedAt : String
+	category : ProductCategoriesDto	
 }

@@ -1,11 +1,9 @@
 package org.graphql.spring.service;
 
-import java.lang.invoke.ConstantBootstraps;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import org.graphql.spring.controller.CustomerController;
 import org.graphql.spring.dto.CustomerAddressesDto;
 import org.graphql.spring.dto.CustomerDto;
 import org.graphql.spring.entity.Customer;
@@ -38,7 +36,10 @@ public class CustomerService {
 	
 	
 	public Flux<CustomerDto> getCustomerStream() {
-		return customerSink.asFlux();
+		return customerSink.asFlux().onErrorResume(e -> {
+            log.error("Customer Subscription error", e);
+            return Flux.empty();
+        });
 	}
 	
 	public CustomerDto addCustomer(CustomerDto newCustomer) {

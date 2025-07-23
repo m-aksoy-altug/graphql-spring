@@ -24,9 +24,9 @@ public class Constant {
 	public static final String CUSTOMER_ADDRESS_NOT_FOUND_BY_COUNTRY="Customer address not found by Country: ";
 	
 	public static final String PRODUCT_CATEGORY_NOT_FOUND= "No product category found";
-	public static final String PRODUCT_CATEGORY_NOT_FOUND_WITH_ID="Product category not found with id: " ;
+	public static final String PRODUCT_CATEGORY_NOT_FOUND_WITH_ID="Product category not found with product category id: " ;
 	public static final String PRODUCT_CATEGORY_NOT_FOUND_AFTER_SAVING="Product category not found after saving";
 	public static final String PRODUCT_CATEGORY_NAME_NOT_FOUND_WITH_ID="Product category name not found with id: " ;
-	
+	public static final String PRODUCT_NOT_FOUND= "No product found";
 	
 }

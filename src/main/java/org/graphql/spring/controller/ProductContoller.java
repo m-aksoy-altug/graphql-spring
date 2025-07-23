@@ -1,12 +1,9 @@
 package org.graphql.spring.controller;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
-import org.graphql.spring.dto.CustomerAddressesDto;
-import org.graphql.spring.dto.CustomerDto;
 import org.graphql.spring.dto.ProductCategoriesDto;
+import org.graphql.spring.dto.ProductDto;
 import org.graphql.spring.exception.NotFoundException;
 import org.graphql.spring.service.ProductService;
 import org.graphql.spring.utils.Constant;
@@ -74,6 +71,16 @@ public class ProductContoller {
 		
 		log.info("addProductCategory:" + productCategoriesDto.toString());
 		return productService.addProductCategory(productCategoriesDto);
+	}
+	
+	@QueryMapping
+	public List<ProductDto> allProducts() {
+		return productService.getAllProducts();
+	}
+	
+	@SchemaMapping(typeName = "ProductDto", field = "category")
+	public ProductCategoriesDto product(ProductDto productDto) {
+	    return productService.getProductCategoryById(productDto.getCategoryId());
 	}
 	
 	

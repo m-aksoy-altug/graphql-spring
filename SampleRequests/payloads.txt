@@ -143,4 +143,29 @@ categoryId
   }
 }
 
+query{
+  allProducts{
+    productId
+    sku
+    name
+    description
+    categoryId 
+    unitPrice
+    weight
+    dimensions
+    isActive
+    createdAt
+    updatedAt
+    category{
+      categoryId
+      name
+      childCategories{
+        name
+      }
+    }
+  }
+}
+
+
+
 
