@@ -8,13 +8,18 @@ export SPRING_DATASOURCE_USERNAME=OrderManagement_user
 export SPRING_DATASOURCE_PASSWORD=OrderManagement_admin_password
 export SPRING_DATASOURCE_DRIVERCLASSNAME=com.mysql.cj.jdbc.Driver
 export SPRING_PROFILES_ACTIVE=dev
+# export SPRING_REDIS_HOST=192.168.1.113, fails use docker container name
+export SPRING_REDIS_HOST=redis-server
+export SPRING_REDIS_PORT=6379
+export SPRING_REDIS_PASSWORD='this$IsMy&Stro1ng$Password123!'
 
 export MYSQL_ROOT_PASSWORD=P@ssw0rd
 export MYSQL_USER=OrderManagement_user
 export MYSQL_PASSWORD=OrderManagement_admin_password
 export MYSQL_DATABASE=OrderManagement
 export MYSQL_VOLUME_PATH="/home/altug/Desktop/mySQLContainer/db:/var/lib/mysql"
-       
+export REDIS_CONFIG="./redis/redis.conf" # For only dev       
+export REDIS_CONTAINER_CONF_PATH="/usr/local/etc/redis/redis.conf"
 
 # Optional: Create a .env file for Docker Compose if needed
 cat <<EOF > .env
@@ -30,6 +35,11 @@ MYSQL_USER=$MYSQL_USER
 MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_DATABASE=$MYSQL_DATABASE
 MYSQL_VOLUME_PATH=$MYSQL_VOLUME_PATH
+REDIS_CONFIG=$REDIS_CONFIG
+REDIS_CONTAINER_CONF_PATH=$REDIS_CONTAINER_CONF_PATH
+SPRING_REDIS_HOST=$SPRING_REDIS_HOST
+SPRING_REDIS_PORT=$SPRING_REDIS_PORT
+SPRING_REDIS_PASSWORD=$SPRING_REDIS_PASSWORD
 EOF
 
 

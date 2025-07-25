@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jakarta.annotation.PostConstruct;
@@ -22,6 +23,7 @@ import jakarta.annotation.PostConstruct;
  * Versioning			Via URL (/v1, /v2)	Versioned WSDLs		Avoided, evolves via schema 
  * Use case				General APIs		Enterprise-legacy	Modern APIs with complex data needs
  * */
+@EnableCaching
 @SpringBootApplication
 public class GraphQLSpringApp {
 	

@@ -9,7 +9,7 @@ services:
        - "8090:8090"
      restart: always
      depends_on:
-       - mysql
+       - mysql # No Redis here
      environment:
        # SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/OrderManagement
        SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -19,6 +19,9 @@ services:
        SERVER_PORT: ${SERVER_PORT}
        SERVER_HOST: ${SERVER_HOST}
        SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+       SPRING_REDIS_HOST: ${SPRING_REDIS_HOST}
+       SPRING_REDIS_PORT: ${SPRING_REDIS_PORT}
+       SPRING_REDIS_PASSWORD: ${SPRING_REDIS_PASSWORD}
   mysql:
      image: mysql:8.0
      ports:
@@ -31,5 +34,14 @@ services:
        MYSQL_DATABASE: ${MYSQL_DATABASE}
      volumes:
        - ${MYSQL_VOLUME_PATH}
+  redis:
+     image: redis:8.0.3
+     container_name: redis-server
+     ports:
+       - "6379:6379"
+     restart: always
+     command: redis-server ${REDIS_CONTAINER_CONF_PATH}
+     volumes:
+       - ${REDIS_CONFIG}:${REDIS_CONTAINER_CONF_PATH}:ro
 # docker exec -it <Cont-Id> bash
 # mysql -u root -p

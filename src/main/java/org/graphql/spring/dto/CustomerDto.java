@@ -18,6 +18,9 @@ public class CustomerDto {
 	private String taxId;
 	private String notes;
 	
+	// Default constructor for Jackson
+	public CustomerDto() {}
+	
 	public CustomerDto(String firstName,String lastName, String email, String phone,LocalDate dateOfBirth) {
 		super();
 		this.firstName = firstName;

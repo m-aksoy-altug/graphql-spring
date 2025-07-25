@@ -15,7 +15,10 @@ import org.graphql.spring.utils.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -42,12 +45,14 @@ public class CustomerService {
         });
 	}
 	
+	@CachePut(value = "customer", key = "#result.customerId", 
+			condition = "#result != null and #result.customerId != null")
+	@Transactional
 	public CustomerDto addCustomer(CustomerDto newCustomer) {
 		Customer custEnt= customersRepo.save(newCustomer.toEntity());
 		CustomerDto savedDto = customersRepo.findById(custEnt.getId())
 		        .map(CustomerDto::fromEntity)
 		        .orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_AFTER_SAVING));
-		
 		customerSink.tryEmitNext(savedDto);
 		return savedDto;
 	}
@@ -63,7 +68,7 @@ public class CustomerService {
 		return CustomerDto.fromEntity(customer);
 	}
 	
-	
+	@Cacheable(value = "customer", key = "#id" , sync = true)
 	public CustomerDto getCustomerById(BigInteger id) {
 	    return customersRepo.findById(id)
 	        .map(CustomerDto::fromEntity)
