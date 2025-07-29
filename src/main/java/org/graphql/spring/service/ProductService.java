@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -24,6 +25,8 @@ public class ProductService {
 	private static final Logger log= LoggerFactory.getLogger(ProductService.class);
 	
 	private final Sinks.Many<ProductCategoriesDto> productCategorySink = Sinks.many().multicast().onBackpressureBuffer();
+	
+	private final Sinks.Many<ProductDto> productSink = Sinks.many().multicast().onBackpressureBuffer();
 	
 	@Autowired
 	private ProductCategoriesRepo productCategoriesRepo;
@@ -61,7 +64,7 @@ public class ProductService {
 	        .orElseThrow(() -> new NotFoundException(Constant.PRODUCT_CATEGORY_NOT_FOUND_WITH_ID + id));
 	}
 	
-	
+	@Transactional
 	public ProductCategoriesDto addProductCategory(ProductCategoriesDto productCategoriesDto) {
 		ProductCategories productCategoryEnt= productCategoriesRepo.save(productCategoriesDto.toEntity());
 		ProductCategoriesDto productCategory = productCategoriesRepo.findById(productCategoryEnt.getId())
@@ -80,5 +83,23 @@ public class ProductService {
 	    return products.stream().map(ProductDto::fromEntity).toList();
 	}
 
+	
+	@Transactional
+	public ProductDto addProduct(ProductDto productDto) {
+	   Product product = productRepo.save(productDto.toEntity());
+	   ProductDto productDtoSaved= productRepo.findById(product.getId())
+					   .map(ProductDto::fromEntity)
+				       .orElseThrow(() -> new NotFoundException(Constant.PRODUCT_NOT_FOUND_AFTER_SAVING));
+	   productSink.tryEmitNext(productDtoSaved);
+		return productDtoSaved;
+	}
+	
+	public Flux<ProductDto> getProductStream() {
+		return productSink.asFlux()
+				 .onErrorResume(e -> {
+		                log.error("Product Subscription error", e);
+		                return Flux.empty();
+		            });
+	}
 	
 }

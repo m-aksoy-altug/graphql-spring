@@ -5,10 +5,11 @@ import java.util.List;
 public class Constant {
 	public static final String DATE_FORMAT= "yyyy-MM-dd";
 	public static final List<String> ADDRESS_TYPE= List.of("billing", "shipping", "both");
-	
+	public static final String CUSTOMER= "customer";
 	
 	public static final String INVALID_ADDRESS_TYPE="Invalid address type: ";
-	public static final String INVALID_NUMBER="Invalid number: ";
+	public static final String INVALID_INTEGER_NUMBER="Invalid integer number: ";
+	public static final String INVALID_DECIMAL_NUMBER="Invalid decimal number: ";
 	
 	public static final String CUSTOMER_NOT_FOUND= "No customers found";
 	public static final String CUSTOMER_NOT_FOUND_WITH= "No customers found with ";
@@ -28,5 +29,5 @@ public class Constant {
 	public static final String PRODUCT_CATEGORY_NOT_FOUND_AFTER_SAVING="Product category not found after saving";
 	public static final String PRODUCT_CATEGORY_NAME_NOT_FOUND_WITH_ID="Product category name not found with id: " ;
 	public static final String PRODUCT_NOT_FOUND= "No product found";
-	
+	public static final String PRODUCT_NOT_FOUND_AFTER_SAVING="Product not found after saving";
 }

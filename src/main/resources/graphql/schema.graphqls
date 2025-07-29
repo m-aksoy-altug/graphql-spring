@@ -19,14 +19,19 @@ type Query {
 }
 
 type Mutation {
+
 	addCustomer(firstName: String!,lastName: String!,email: String!,phone: String!,dateOfBirth: String!): CustomerDto
 	addCustomerAddressByEmail(email: String!, addressType : String!, streetAddress1 : String!,streetAddress2 : String, city : String!,stateProvince : String!,postalCode : String!,country : String! ): CustomerDto
 	addProductCategory(parentCategoryId: String , name: String!, description: String!): ProductCategoriesDto
+	addProduct(sku: String , name: String!, description: String!, categoryId: String!, unitPrice: String!, weight: String!, dimensions: String!): ProductDto
+	
+	deleteCustomerByEmail(email: String!): CustomerDto
 }
 
 type Subscription {
     customerRegistered: CustomerDto!
     productCategoriesRegistered: ProductCategoriesDto!
+    productRegistered: ProductDto!
 }
 
 

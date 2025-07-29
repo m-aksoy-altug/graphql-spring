@@ -167,5 +167,18 @@ query{
 }
 
 
+mutation{
+	deleteCustomerByEmail(
+	  email:"janeWhiteg@gmail.com"){
+	  customerId
+	  firstName
+	  lastName
+	  email
+	  phone
+	  dateOfBirth
+	  registrationDate
+	}
+}
+
 
 

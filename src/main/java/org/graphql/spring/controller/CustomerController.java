@@ -75,7 +75,7 @@ public class CustomerController {
 	
 	@QueryMapping
 	public CustomerDto customerById(@Argument String id) {
-		return customerService.getCustomerById(Utils.convertStrFromBigInt(id));
+		return customerService.getCustomerById(Utils.convertStrForBigInt(id));
 	}
 
 	@QueryMapping
@@ -96,17 +96,22 @@ public class CustomerController {
 		return customerService.getCustomerByFirstAndLastName(firstName, lastName);
 	}
 	
-	// Each has unique email address
+	
 	@QueryMapping
 	public CustomerDto customerByEmail(@Argument String email) {
 		// log.info("customerByEmail:"+email);
 		return customerService.getCustomerByEmail(email);
 	}
 	
+	@MutationMapping
+	public CustomerDto deleteCustomerByEmail(@Argument String email) {
+		return customerService.deleteCustomerByEmail(email);
+	}
+	
 	@QueryMapping
 	public List<CustomerAddressesDto> customerAddressByCustomerId(@Argument String id) {
 		log.info("customerAddressByCustomerId:"+id);
-		return customerService.customerAddressByCustomerId(Utils.convertStrFromBigInt(id));
+		return customerService.customerAddressByCustomerId(Utils.convertStrForBigInt(id));
 	}
 	
 	@QueryMapping

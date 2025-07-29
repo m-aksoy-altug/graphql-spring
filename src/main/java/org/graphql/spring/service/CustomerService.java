@@ -15,6 +15,7 @@ import org.graphql.spring.utils.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,143 +26,146 @@ import reactor.core.publisher.Sinks;
 
 @Service
 public class CustomerService {
-	
-	private static final Logger log= LoggerFactory.getLogger(CustomerService.class);
+
+	private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
 
 	// Sink type must match with return Flux<Object>
 	private final Sinks.Many<CustomerDto> customerSink = Sinks.many().multicast().onBackpressureBuffer();
-	
+
 	@Autowired
-	private  CustomerRepo customersRepo;
-	
+	private CustomerRepo customersRepo;
+
 	@Autowired
-	private  CustomerAddressesRepo customerAddressesRepo;
-	
-	
+	private CustomerAddressesRepo customerAddressesRepo;
+
 	public Flux<CustomerDto> getCustomerStream() {
 		return customerSink.asFlux().onErrorResume(e -> {
-            log.error("Customer Subscription error", e);
-            return Flux.empty();
-        });
+			log.error("Customer Subscription error", e);
+			return Flux.empty();
+		});
 	}
-	
-	@CachePut(value = "customer", key = "#result.customerId", 
-			condition = "#result != null and #result.customerId != null")
+
+	@CachePut(value = "customer", key = "#result.customerId", condition = "#result != null and #result.customerId != null")
 	@Transactional
 	public CustomerDto addCustomer(CustomerDto newCustomer) {
-		Customer custEnt= customersRepo.save(newCustomer.toEntity());
-		CustomerDto savedDto = customersRepo.findById(custEnt.getId())
-		        .map(CustomerDto::fromEntity)
-		        .orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_AFTER_SAVING));
+		Customer custEnt = customersRepo.save(newCustomer.toEntity());
+		CustomerDto savedDto = customersRepo.findById(custEnt.getId()).map(CustomerDto::fromEntity)
+				.orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_AFTER_SAVING));
 		customerSink.tryEmitNext(savedDto);
 		return savedDto;
 	}
-	
+
+	@CacheEvict(value = "customer", key = "#result.customerId", beforeInvocation = false
+						, condition = "#result != null and #result.customerId != null")
+	@Transactional
+	public CustomerDto deleteCustomerByEmail(String email) {
+		Optional<Customer> customer = customersRepo.findByEmail(email);
+		if (!customer.isPresent()) {
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email);
+		}
+		customersRepo.delete(customer.get());
+		return CustomerDto.fromEntity(customer.get());
+	}
+
 	public CustomerDto addCustomerAddressByEmail(String email, CustomerAddressesDto customerAddressesDto) {
-		Customer customer= customersRepo.
-				findByEmail(email).orElseThrow(()->
-				new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email));
-		
+		Customer customer = customersRepo.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email));
+
 		customerAddressesDto.setCustomerId(customer.getId());
-		CustomerAddresses custEnt= customerAddressesDto.toEntity();
+		CustomerAddresses custEnt = customerAddressesDto.toEntity();
 		customerAddressesRepo.save(custEnt);
 		return CustomerDto.fromEntity(customer);
 	}
-	
-	@Cacheable(value = "customer", key = "#id" , sync = true)
+
+	@Cacheable(value = "customer", key = "#id", sync = true)
 	public CustomerDto getCustomerById(BigInteger id) {
-	    return customersRepo.findById(id)
-	        .map(CustomerDto::fromEntity)
-	        .orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_ID + id));
+		return customersRepo.findById(id).map(CustomerDto::fromEntity)
+				.orElseThrow(() -> new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_ID + id));
 	}
-	
+
 	public List<CustomerDto> getCustomerByFirstName(String firstName) {
-	    List<Customer> customers = customersRepo.findByFirstName(firstName);
-	    //customers.stream().forEach(x->log.info("getCustomerByFirstName:"+x.toString()));
+		List<Customer> customers = customersRepo.findByFirstName(firstName);
+		// customers.stream().forEach(x->log.info("getCustomerByFirstName:"+x.toString()));
 		if (customers.isEmpty()) {
-	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_FIRST_NAME+ firstName);
-	    }
-	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_FIRST_NAME + firstName);
+		}
+		return customers.stream().map(CustomerDto::fromEntity).toList();
 	}
-	
+
 	public List<CustomerDto> getCustomerByLastName(String lastName) {
-	    List<Customer> customers = customersRepo.findByLastName(lastName);
-	    // customers.stream().forEach(x->log.info("getCustomerByLastName:"+x.toString()));
+		List<Customer> customers = customersRepo.findByLastName(lastName);
+		// customers.stream().forEach(x->log.info("getCustomerByLastName:"+x.toString()));
 		if (customers.isEmpty()) {
-	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_LAST_NAME+ lastName);
-	    }
-	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_LAST_NAME + lastName);
+		}
+		return customers.stream().map(CustomerDto::fromEntity).toList();
 	}
-	
-	public List<CustomerDto> getCustomerByFirstAndLastName(String firstName,String lastName) {
-	    List<Customer> customers = customersRepo.findByFirstNameAndLastName(firstName, lastName);
+
+	public List<CustomerDto> getCustomerByFirstAndLastName(String firstName, String lastName) {
+		List<Customer> customers = customersRepo.findByFirstNameAndLastName(firstName, lastName);
 		// customers.stream().forEach(x->log.info("getCustomerByFirstAndLastName:"+x.toString()));
-	    
+
 		if (customers.isEmpty()) {
-	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH+lastName +" "+ lastName);
-	    }
-	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH + lastName + " " + lastName);
+		}
+		return customers.stream().map(CustomerDto::fromEntity).toList();
 	}
-	
+
 	public CustomerDto getCustomerByEmail(String email) {
-	    Optional<Customer>customer = customersRepo.findByEmail(email);
-	    // customers.stream().forEach(x->log.info("getCustomerByEmail:"+x.toString()));
-	   if (!customer.isPresent()) {
-	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email);
-	    }
+		Optional<Customer> customer = customersRepo.findByEmail(email);
+		// customers.stream().forEach(x->log.info("getCustomerByEmail:"+x.toString()));
+		if (!customer.isPresent()) {
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND_WITH_EMAIL + email);
+		}
 		return CustomerDto.fromEntity(customer.get());
 	}
-	
+
 	public List<CustomerDto> getAllCustomers() {
-	    List<Customer> customers = customersRepo.findAll();
-	    if (customers.isEmpty()) {
-	        throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND);
-	    }
-	    return customers.stream().map(CustomerDto::fromEntity).toList(); 
+		List<Customer> customers = customersRepo.findAll();
+		if (customers.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_NOT_FOUND);
+		}
+		return customers.stream().map(CustomerDto::fromEntity).toList();
 	}
-	
-	
+
 	public List<CustomerAddressesDto> customerAddressByCustomerId(BigInteger id) {
-	    List<CustomerAddresses> addressEntity= customerAddressesRepo.findByCustomerId(id);
-	    if (addressEntity.isEmpty()) {
-	        throw  new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_ID + id);
-	    }
-	    return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
+		List<CustomerAddresses> addressEntity = customerAddressesRepo.findByCustomerId(id);
+		if (addressEntity.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_ID + id);
+		}
+		return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
 	}
-	
+
 	public List<CustomerAddressesDto> customerAddressByCity(String city) {
-	    List<CustomerAddresses> addressEntity= customerAddressesRepo.findByCity(city);
-	    if (addressEntity.isEmpty()) {
-	        throw  new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_CITY + city);
-	    }
-	    return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
+		List<CustomerAddresses> addressEntity = customerAddressesRepo.findByCity(city);
+		if (addressEntity.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_CITY + city);
+		}
+		return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
 	}
-	
+
 	public List<CustomerAddressesDto> customerAddressByPostCode(String postCode) {
-	    List<CustomerAddresses> addressEntity= customerAddressesRepo.findByPostalCode(postCode);
-	    if (addressEntity.isEmpty()) {
-	        throw  new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_POST_CODE + postCode);
-	    }
-	    return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
+		List<CustomerAddresses> addressEntity = customerAddressesRepo.findByPostalCode(postCode);
+		if (addressEntity.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_WITH_POST_CODE + postCode);
+		}
+		return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
 	}
-	
+
 	public List<CustomerAddressesDto> customerAddressByCountry(String country) {
-	    List<CustomerAddresses> addressEntity= customerAddressesRepo.findByCountry(country);
-	    if (addressEntity.isEmpty()) {
-	        throw  new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_BY_COUNTRY + country);
-	    }
-	    return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
+		List<CustomerAddresses> addressEntity = customerAddressesRepo.findByCountry(country);
+		if (addressEntity.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND_BY_COUNTRY + country);
+		}
+		return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
 	}
-	
-	
+
 	public List<CustomerAddressesDto> allAddresses() {
-	    List<CustomerAddresses> addressEntity = customerAddressesRepo.findAll();
-	    if (addressEntity.isEmpty()) {
-	        throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND);
-	    }
-	    return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList(); 
+		List<CustomerAddresses> addressEntity = customerAddressesRepo.findAll();
+		if (addressEntity.isEmpty()) {
+			throw new NotFoundException(Constant.CUSTOMER_ADDRESS_NOT_FOUND);
+		}
+		return addressEntity.stream().map(CustomerAddressesDto::fromEntity).toList();
 	}
-	
-	
-	
+
 }
