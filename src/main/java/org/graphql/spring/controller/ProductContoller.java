@@ -101,17 +101,12 @@ public class ProductContoller {
 		ProductCategoriesDto productCategory = productService
 				.getProductCategoryById(Utils.convertStrForBigInt(categoryId));
 
-		if (productCategory.getName() == null || productCategory.getName().isBlank()) {
-			throw new NotFoundException(
-					Constant.PRODUCT_CATEGORY_NAME_NOT_FOUND_WITH_ID + productCategory.getCategoryId());
-		}
-
 		BigDecimal bigDecUnitPrice = Utils.convertStrForBigDec(unitPrice);
 		BigDecimal bigDecWeight = Utils.convertStrForBigDec(weight);
 
 		ProductDto productDto = new ProductDto(null, sku, name, description, productCategory.getCategoryId(),
 				bigDecUnitPrice, bigDecWeight, dimensions);
-		return productService.addProduct(productDto);
+		return productService.addProduct(productDto,productCategory);
 
 	}
 

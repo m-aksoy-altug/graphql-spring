@@ -180,5 +180,26 @@ mutation{
 	}
 }
 
+mutation{
+  addProduct(name: "Dummy HP Laptop",
+        description: "16 HD, 16GB RAM, 256GB SSD",
+        categoryId: "5",
+        unitPrice: "1599.99",
+        weight: "4.21",
+        dimensions: "13.3 x 5.1 x 0.8"){
+		productId
+      sku
+      name
+      description
+      categoryId
+      unitPrice
+      weight
+      dimensions
+      isActive
+      createdAt
+      updatedAt
+     }
+ }
+  
 
 

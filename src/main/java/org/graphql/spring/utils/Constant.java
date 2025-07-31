@@ -30,4 +30,6 @@ public class Constant {
 	public static final String PRODUCT_CATEGORY_NAME_NOT_FOUND_WITH_ID="Product category name not found with id: " ;
 	public static final String PRODUCT_NOT_FOUND= "No product found";
 	public static final String PRODUCT_NOT_FOUND_AFTER_SAVING="Product not found after saving";
+	
+	public static final String GIVEN_SKU_IS_INVALID_FORMAT="Given sku is invalid format, passing sku null or empty sku triggers automatic sku generation";
 }

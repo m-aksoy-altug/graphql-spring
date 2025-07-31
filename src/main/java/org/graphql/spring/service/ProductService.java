@@ -2,6 +2,7 @@ package org.graphql.spring.service;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import org.graphql.spring.dto.ProductCategoriesDto;
 import org.graphql.spring.dto.ProductDto;
@@ -11,6 +12,7 @@ import org.graphql.spring.exception.NotFoundException;
 import org.graphql.spring.repo.ProductCategoriesRepo;
 import org.graphql.spring.repo.ProductRepo;
 import org.graphql.spring.utils.Constant;
+import org.graphql.spring.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +87,8 @@ public class ProductService {
 
 	
 	@Transactional
-	public ProductDto addProduct(ProductDto productDto) {
+	public ProductDto addProduct(ProductDto productDto, ProductCategoriesDto productCategory) {
+	   skuCheck(productDto,productCategory);
 	   Product product = productRepo.save(productDto.toEntity());
 	   ProductDto productDtoSaved= productRepo.findById(product.getId())
 					   .map(ProductDto::fromEntity)
@@ -101,5 +104,37 @@ public class ProductService {
 		                return Flux.empty();
 		            });
 	}
+	
+	private void skuCheck(ProductDto productDto, ProductCategoriesDto productCategory) {
+		String givenSku= productDto.getSku();
+		String baseSku= Utils.generateBaseSku(productCategory.getName());
+		 log.info("Given sku: "+givenSku+ ", base sku: "+ baseSku);
+		if(givenSku==null || givenSku.isBlank()) {
+			skuCreation(productDto,baseSku);
+		}
+		else {
+			if(!Utils.skuValidFormat(givenSku) || !baseSku.equals(givenSku.substring(0, 2))) {
+				throw new IllegalArgumentException(Constant.GIVEN_SKU_IS_INVALID_FORMAT);
+			}
+			skuCreation(productDto,baseSku);
+		}
+	}
+	
+	private void skuCreation(ProductDto productDto, String baseSku) {
+		Optional<Product> highestSkOpt= productRepo.findTopBySkuBaseOrderBySuffixDesc(baseSku);
+		if(highestSkOpt.isPresent()) {
+			String highestSku= highestSkOpt.get().getSku();
+			String charPart = highestSku.substring(0, highestSku.indexOf('-'));
+		    String numericPart = highestSku.substring(highestSku.indexOf('-') + 1);
+			Integer numeric= Integer.parseInt(numericPart);
+			log.info("highestSku"+ highestSku);
+			productDto.setSku( String.format("%s-%06d", charPart, numeric + 1));
+		}else {
+			log.info("Sku with new base sku");
+			productDto.setSku( String.format("%s-%06d", baseSku, 000001));
+		}
+	}
+	
+	
 	
 }

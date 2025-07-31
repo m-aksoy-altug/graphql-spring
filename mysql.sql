@@ -141,6 +141,19 @@ INSERT INTO products (sku, name, description, category_id, unit_price, weight, d
 (SELECT category_id FROM product_categories WHERE NAME= 'Refrigerators') , 799.99, 180.0, '30.0 x 65.5 x 32.5', TRUE, '2024-01-15 00:00:00');
 
 
+SELECT p.sku,p.product_id,pc.name from products p join product_categories pc where p.category_id=pc.category_id;
+UPDATE products SET sku='COM-000001' WHERE product_id = 1;
+UPDATE products SET sku='SMA-000001' WHERE product_id = 2;
+UPDATE products SET sku='OFC-000001' WHERE product_id = 3;
+UPDATE products SET sku='REF-000001' WHERE product_id = 4;
+UPDATE products SET sku='MEC-000001' WHERE product_id = 5;
+UPDATE products SET sku='WOC-000001' WHERE product_id = 6;
+UPDATE products SET sku='COM-000002' WHERE product_id = 7;
+UPDATE products SET sku='SMA-000002' WHERE product_id = 8;
+UPDATE products SET sku='OFC-000002' WHERE product_id = 9;
+UPDATE products SET sku='REF-000002' WHERE product_id = 10;
+
+
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
